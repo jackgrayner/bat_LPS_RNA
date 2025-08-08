@@ -11,5 +11,5 @@ source activate mirdeep2
 cat ../*collapsed.fa > all_collapsed.fa
 #nb bat sequences from Li et al. 2022, Ecol & Evol
 #mammal seqs from mirbase
-/mnt/apps/users/jrayner/conda/envs/mirdeep2/bin/mapper.pl all_collapsed.fa -c -o 8 -i -j -m -s all_collapsed.fa -t all_collapsed.arf -p ../phha
+/mnt/apps/users/jrayner/conda/envs/mirdeep2/bin/mapper.pl all_collapsed1.fa -c -o 8 -i -j -m -s all_collapsed.fa -t all_collapsed.arf -p ../phha
 /mnt/apps/users/jrayner/conda/envs/mirdeep2/bin/miRDeep2.pl all_collapsed.fa ../phha_genomic_nowhitespace.fa all_collapsed.arf none ../bats_mammal_mature_nowhitespace.fa ../mammal_hairpin_nowhitespace.fa 
