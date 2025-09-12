@@ -25,6 +25,6 @@ do
 	cat miRNAs_expressed_all_samples_${sample}.csv | awk '{print $2}' > ${sample}_expression
 done < ../../sample_list
 
-cat miRNAs_expressed_all_samples_2311_TH.csv | awk '{print $3}' > mirna_ids
+cat miRNAs_expressed_all_samples_2311_TH.csv | awk '{print $1}' > mirna_ids
 paste mirna_ids *_expression > all_samples_expression.tsv
 
