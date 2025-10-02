@@ -9,6 +9,9 @@
 #SBATCH --output=mirdeep_quant.log
 source activate mirdeep2
 
+cat novel_pha_rnas_filtered_precursor.fa all_hairpin.fa > novel_all_hairpin.fa
+cat novel_pha_rnas_filtered_mature.fa mirbase_bats_mammal_mature.fa > novel_all_mature.fa
+
 #remove duplicate mature sequences (sorted by seq, then sorted by name, then dupes removed - in R)
 while read line
 do
