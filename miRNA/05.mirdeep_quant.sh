@@ -12,15 +12,20 @@ source activate mirdeep2
 cat novel_pha_rnas_filtered_precursor.fa all_hairpin.fa > novel_all_hairpin.fa
 cat novel_pha_rnas_filtered_mature.fa mirbase_bats_mammal_mature.fa > novel_all_mature.fa
 
-#remove duplicate mature sequences (sorted by seq, then sorted by name, then dupes removed - in R)
+#remove duplicate sequences (sorted by seq, then sorted by name, then dupes removed - in R)
 while read line
 do
-  grep -A 1 -w $line phha_mammal_mature.fa >> phha_mammal_mature_unique.fa
-done < keep_dedup.txt
+  grep -A 1 -w $line novel_all_mature.fa >> phha_mammal_mature_unique.fa
+done < dedup_mature_ids.txt
+
+while read line
+do
+  grep -A 1 -w $line novel_all_hairpin.fa >> phha_mammal_hairpin_unique.fa
+done < dedup_hairpin_ids.txt
 
 while read sample
 do
-	/mnt/apps/users/jrayner/conda/envs/mirdeep2/bin/quantifier.pl -y ${sample} -d -p ../phha_mammal_hairpin.fa -m ../phha_mammal_mature_unique.fa -r ../${sample}_collapsed.fa 
+	/mnt/apps/users/jrayner/conda/envs/mirdeep2/bin/quantifier.pl -y ${sample} -d -p phha_mammal_hairpin_unique.fa -m phha_mammal_mature_unique.fa -r ../${sample}_collapsed.fa 
 done < ../../sample_list
 
 while read sample
