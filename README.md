@@ -8,4 +8,7 @@ We collected blood from bats in 50ul volume, which we either preserved or treate
 
 Gene expression counts were quantified against a reference transcriptome for Phyllostomus hastatus using Kallisto. Differential expression analyses were performed using DESeq2 in R.
 
+## Availability of sequencing data
+
+Raw reads are available from the NCBI SRA under the BioProject accession PRJNA1125049.
 
