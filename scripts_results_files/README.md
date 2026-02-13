@@ -7,7 +7,7 @@ samples_all.csv - bat metadata for all samples
 
 ### R session info
 
-R version 4.4.2 (2024-10-31)
+```R version 4.4.2 (2024-10-31)
 Platform: aarch64-apple-darwin20
 Running under: macOS Sonoma 14.3
 
@@ -65,4 +65,4 @@ loaded via a namespace (and not attached):
 [131] tzdb_0.4.0              foreach_1.5.2           tweenr_2.0.3            polyclip_1.10-7         ggforce_0.4.2          
 [136] broom_1.0.7             xtable_1.8-4            fANCOVA_0.6-1           tidytree_0.4.6          viridisLite_0.4.2      
 [141] lmerTest_3.1-3          aplot_0.2.4             memoise_2.0.1           beeswarm_0.4.0          cluster_2.1.8          
-[146] timechange_0.3.0  
+[146] timechange_0.3.0  ```
