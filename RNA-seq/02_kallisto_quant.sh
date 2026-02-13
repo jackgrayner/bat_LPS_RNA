@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=Kal_aln
-#SBATCH -t 3:0:0
+#SBATCH -t 1:0:0
 #SBATCH -n 1
 #SBATCH --mem-per-cpu=8G
 #SBATCH --oversubscribe
