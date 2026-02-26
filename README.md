@@ -18,7 +18,7 @@ Bash scripts used to process raw RNA-sequencing data
 
 ## miRNA
 
-Bash and R scripts used to process and analyses miRNA sequencing data
+Bash and R scripts used to process and analyse miRNA sequencing data
 
 ## scripts_results_files
 
