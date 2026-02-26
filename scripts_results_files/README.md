@@ -4,7 +4,7 @@
 Differential expression analysis R scripts for each species. The bat_analysis directory also includes the WGCNA R script.
 
 ### Data files
-cts_all.csv - raw counts for all samples
+cts_all.csv - raw counts for all bat samples
 
 samples_all.csv - bat metadata for all samples 
  - Rownames: Sample IDs (sample no. nested within sequencing batch). Note Phases 1 and 2 were not included in the reported analysis due to methodological issues (incubated at lower than body temperature).
