@@ -19,8 +19,6 @@
 
 #####################
 
-setwd("~/Documents/UMD_new/nih_rna/writeup/scripts_results_files/")
-
 ## load libraries and set working directory
 library(DESeq2) 
 library(edgeR) 
