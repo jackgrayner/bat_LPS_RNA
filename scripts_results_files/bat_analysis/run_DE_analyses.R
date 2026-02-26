@@ -19,7 +19,7 @@
 
 #####################
 
-setwd("~/Documents/UMD_new/nih_rna/writeup/scripts_results_files/")
+## script assumes you have already run load_data_functions_summarise.R
 
 #####################
 # 03. DE ANALYSIS OF PAIRED SAMPLES
