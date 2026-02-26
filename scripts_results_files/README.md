@@ -26,15 +26,6 @@ samples_all.csv - bat metadata for all samples
  - TTH: toothwear score on 10 point scale, 1 = no wear, 5 = extremely heavily worn.
  - STATUS: male status (bachelor or harem)
  - LN.N.L.: natural log of the neutrophil-to-lymphocyte ratio for the blood sample
- 
-
-phase7_paired_th_vs_c0.csv - Results of differential expression analysis between paired untreated (c0) and LPS-treated (TH) samples
-
-phases3-7_TH_age_effect.csv - Results of differential expression analysis testing differences between ages among LPS-treated transcriptomes
-
-phases3-7_TH_sex_effect.csv - Results of differential expression analysis testing differences between sexes among LPS-treated transcriptomes
-
-In all cases, see DESeq2 vignette for details of column names https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html
 
 ### R session info
 
