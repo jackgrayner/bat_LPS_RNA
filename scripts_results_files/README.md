@@ -4,25 +4,25 @@
 cts_all.csv - raw counts for all samples
 
 samples_all.csv - bat metadata for all samples 
- Rownames: Sample IDs (sample no. nested within sequencing batch). Note Phases 1 and 2 were not included in the reported analysis due to methodological issues (incubated at lower than body temperature).
- Phase: Phase of project. Essentially reflects RNA library preparation batch.
- Phase.batch: phase concated with sequencing batch (as some phases had to be split across multiple sequencing batches); used as confounding blocking variable in analysis.
- Ban_Yr_Mo: concatenated band (i.e., bat ID), year and month of sampling
- Trtmt: Code representing how the sample was treated (LPS0.1 = 5ul LPS added for final concentration of 0.1ug/ml, LPS_1 = 5ul LPS added for final concentration of 1ug/ml LPS, PBS = 5ul PBS added, 
- Temp: temperature sample was kept at
- Duration: duration for which sample was kept at Temp
- SampleTime: time blood sampled
- DecTime: decimalised time blood sampled
- Sex: individiual sex
- Est.Age: individual estimate age in years
- Cave: Location at which individual captured
- Site: Location within site individual captured from
- Group: Roost group
- FA: forearm length in mm
- WT: Weight in g
- TTH: toothwear score on 10 point scale, 1 = no wear, 5 = extremely heavily worn.
- STATUS: male status (bachelor or harem)
- LN.N.L.: natural log of the neutrophil-to-lymphocyte ratio for the blood sample
+ - Rownames: Sample IDs (sample no. nested within sequencing batch). Note Phases 1 and 2 were not included in the reported analysis due to methodological issues (incubated at lower than body temperature).
+ - Phase: Phase of project. Essentially reflects RNA library preparation batch.
+ - Phase.batch: phase concated with sequencing batch (as some phases had to be split across multiple sequencing batches); used as confounding blocking variable in analysis.
+ - Ban_Yr_Mo: concatenated band (i.e., bat ID), year and month of sampling
+ - Trtmt: Code representing how the sample was treated (LPS0.1 = 5ul LPS added for final concentration of 0.1ug/ml, LPS_1 = 5ul LPS added for final concentration of 1ug/ml LPS, PBS = 5ul PBS added, 
+ - Temp: temperature sample was kept at
+ - Duration: duration for which sample was kept at Temp
+ - SampleTime: time blood sampled
+ - DecTime: decimalised time blood sampled
+ - Sex: individiual sex
+ - Est.Age: individual estimate age in years
+ - Cave: Location at which individual captured
+ - Site: Location within site individual captured from
+ - Group: Roost group
+ - FA: forearm length in mm
+ - WT: Weight in g
+ - TTH: toothwear score on 10 point scale, 1 = no wear, 5 = extremely heavily worn.
+ - STATUS: male status (bachelor or harem)
+ - LN.N.L.: natural log of the neutrophil-to-lymphocyte ratio for the blood sample
  
 
 phase7_paired_th_vs_c0.csv - Results of differential expression analysis between paired untreated (c0) and LPS-treated (TH) samples
