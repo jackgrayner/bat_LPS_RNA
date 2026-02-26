@@ -1,0 +1,4 @@
+01_kallisto_index.sh: create index of transcriptome
+02_kallisto_quant.sh: run quantification of transcripts
+03_DESeq2_Desmodus.R: not meant to be in this repository
+PhHa_rRNA_haem...: list of probe sequences used to remove globins and rRNAs during library prep.
