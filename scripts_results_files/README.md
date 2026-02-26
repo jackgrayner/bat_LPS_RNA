@@ -1,5 +1,8 @@
 ## Scripts, results and other files
 
+### Subdirectories
+Differential expression analysis R scripts for each species. The bat_analysis directory also includes the WGCNA R script.
+
 ### Data files
 cts_all.csv - raw counts for all samples
 
