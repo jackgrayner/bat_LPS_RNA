@@ -19,7 +19,7 @@
 
 #####################
 
-setwd("~/Documents/UMD_new/nih_rna/writeup/scripts_results_files/")
+## script assumes you have already run load_data_functions_summarise.R
 
 #####################
 # 09. WGCNA module analyses of LPS-treated samples
