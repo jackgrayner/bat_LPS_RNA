@@ -23,11 +23,13 @@ do
   grep -A 1 -w $line novel_all_hairpin.fa >> phha_mammal_hairpin_unique.fa
 done < dedup_hairpin_ids.txt
 
+#now run quantification
 while read sample
 do
 	/mnt/apps/users/jrayner/conda/envs/mirdeep2/bin/quantifier.pl -y ${sample} -d -p phha_mammal_hairpin_unique.fa -m phha_mammal_mature_unique.fa -r ../${sample}_collapsed.fa 
 done < ../../sample_list
 
+#combine results files
 while read sample
 do
 	cat miRNAs_expressed_all_samples_${sample}.csv | awk '{print $2}' > ${sample}_expression
