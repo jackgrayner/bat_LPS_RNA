@@ -10,5 +10,10 @@ nov$Ph_ID<-paste0("pha-miR-",c(1000:(999+nrow(nov))))
 nov$consensus.mature.sequence<-toupper(nov$consensus.mature.sequence)
 nov$consensus.precursor.sequence<-toupper(nov$consensus.precursor.sequence)
 
-write.table(nov[,c("Ph_ID","consensus.precursor.sequence")],file="novel_pha_rnas_filtered_precursor.fa",sep="\n>",row.names=FALSE,quote=FALSE,col.names=FALSE)
-write.table(nov[,c("Ph_ID","consensus.mature.sequence")],file="novel_pha_rnas_filtered_mature.csv",sep="\n>",row.names=FALSE,quote=FALSE,col.names=FALSE)
+nov.hairpin<-data.frame(nov[,c("Ph_ID","consensus.precursor.sequence")])
+nov.hairpin$Ph_ID<-paste0(">",nov.hairpin$Ph_ID)
+write.table(nov.hairpin,file="novel_pha_rnas_filtered_precursor.fa",sep="\n",row.names=FALSE,quote=FALSE,col.names=FALSE)
+
+nov.mature<-data.frame(nov[,c("Ph_ID","consensus.mature.sequence")])
+nov.mature$Ph_ID<-paste0(">",nov.mature$Ph_ID)
+write.table(nov.mature,file="novel_pha_rnas_filtered_mature.fa",sep="\n",row.names=FALSE,quote=FALSE,col.names=FALSE)
