@@ -45,7 +45,7 @@ done < ../../sample_list
 #combine results files
 while read sample
 do
-	cat miRNAs_expressed_all_samples_${sample}.csv | awk '{print $2}'  | sed 's/read_count/${sample}/g' > ${sample}_expression
+	cat miRNAs_expressed_all_samples_${sample}.csv | awk '{print $2}'  | sed "s/read_count/${sample}/g" > ${sample}_expression
 done < ../../sample_list
 
 cat miRNAs_expressed_all_samples_2311_TH.csv | awk '{print $1}' > mirna_ids
