@@ -12,27 +12,40 @@ source activate mirdeep2
 cat novel_pha_rnas_filtered_precursor.fa all_hairpin.fa > novel_all_hairpin.fa
 cat novel_pha_rnas_filtered_mature.fa mirbase_bats_mammal_mature.fa > novel_all_mature.fa
 
-#remove duplicate sequences (sorted by seq, then sorted by name, then dupes removed - in R)
-while read line
-do
-  grep -A 1 -w $line novel_all_mature.fa >> phha_mammal_mature_unique.fa
-done < dedup_mature_ids.txt
+#remove duplicate mature sequences 
+#switch to columns
+awk 'NR%2==1 {h=$0} NR%2==0 {print $0"\t"h}' novel_all_mature.fa \
+| sort -k1,1 \
+| awk '{
+    if (!seen[$1]) {
+        name=$2
+        sub(/^>/,"",name)
+        print ">"name"\n"$1
+        seen[$1]=1
+    }
+}' >  novel_all_mature_dedupe.fa
 
-while read line
-do
-  grep -A 1 -w $line novel_all_hairpin.fa >> phha_mammal_hairpin_unique.fa
-done < dedup_hairpin_ids.txt
+awk 'NR%2==1 {h=$0} NR%2==0 {print $0"\t"h}' novel_all_hairpin.fa \
+| sort -k1,1 \
+| awk '{
+    if (!seen[$1]) {
+        name=$2
+        sub(/^>/,"",name)
+        print ">"name"\n"$1
+        seen[$1]=1
+    }
+}' >  novel_all_hairpin_dedupe.fa
 
 #now run quantification
 while read sample
 do
-	/mnt/apps/users/jrayner/conda/envs/mirdeep2/bin/quantifier.pl -y ${sample} -d -p phha_mammal_hairpin_unique.fa -m phha_mammal_mature_unique.fa -r ../${sample}_collapsed.fa 
+	/mnt/apps/users/jrayner/conda/envs/mirdeep2/bin/quantifier.pl -y ${sample} -d -p novel_all_hairpin_dedupe.fa -m novel_all_mature_dedupe.fa -r ../${sample}_collapsed.fa 
 done < ../../sample_list
 
 #combine results files
 while read sample
 do
-	cat miRNAs_expressed_all_samples_${sample}.csv | awk '{print $2}' > ${sample}_expression
+	cat miRNAs_expressed_all_samples_${sample}.csv | awk '{print $2}'  | sed 's/read_count/${sample}/g' > ${sample}_expression
 done < ../../sample_list
 
 cat miRNAs_expressed_all_samples_2311_TH.csv | awk '{print $1}' > mirna_ids
