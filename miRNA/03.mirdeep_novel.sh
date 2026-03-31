@@ -11,7 +11,7 @@ source activate mirdeep2
 #concatenate
 cat ../*collapsed.fa > all_collapsed1.fa
 #collapse concatenated fasta
-/mnt/apps/users/jrayner/conda/envs/mirdeep2/bin/mapper.pl all_collapsed1.fa -c -o 8 -i -j -m -s all_collapsed.fa -t all_collapsed.arf -p ../phha
+/mnt/apps/users/jrayner/conda/envs/mirdeep2/bin/mapper.pl all_collapsed1.fa -c -i -j -m -s all_collapsed.fa -t all_collapsed.arf -p ../phha
 
 #keep only human, mouse, bat miRNAs
 grep -A 1 "^>hsa\|^>mmu\|^>aja\|^>pal\|^>efu" hairpin_nowhitespace.fa | grep -v "\-\-" > mirbase_bats_mammal_hairpin.fa
