@@ -6,4 +6,4 @@
 - 04.filter_novel_miRNAs.R: filter novel miRNAs
 - 05.mirdeep_quant.sh: quantify abundance of final miRNA set
 - miRNA_analysis.R: perform differential abundance analysis in DESeq2
-- novel_...: novel hairpin and mature sequences identified by miRDeep2
+- novel_...: hairpin and mature sequences used in quantification
