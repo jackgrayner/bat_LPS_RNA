@@ -52,6 +52,8 @@ phases3-7_TH_age_effect.csv - Results of differential expression analysis testin
 
 phases3-7_TH_sex_effect.csv - Results of differential expression analysis testing differences between sexes among LPS-treated transcriptomes
 
+bat_ortho_dge.csv - LPS effect results with EggNog IDs added
+
 In all cases, see DESeq2 vignette for details of column names https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html
 
 ### R session info
