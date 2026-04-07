@@ -158,8 +158,8 @@ plot_volcano<-function(df){
 #####################
 # 01. READ. FILTER, ORGANISE DATA
 
-samples.all<-read.csv("samples_all.csv",h=T,row.names=1)
-cts.all<-read.csv("cts_all.csv",h=T,row.names=1)
+samples.all<-read.csv("samples_phases_3_to_7.csv",h=T,row.names=1)
+cts.all<-read.csv("cts_phases_3_to_7.csv",h=T,row.names=1)
 
 ## scale age, ensure variables are treated appropriately (e.g., band and year treated as factors)
 samples.all$Age<-scale(samples.all$Est.Age)
@@ -196,7 +196,7 @@ g.ages.paired<-ggplot(samples.all[samples.all$Phase %in% c("Phase7.1","Phase7.2"
   ggtitle("Paired individuals")
 
 g.ages.th+g.ages.c0+g.ages.paired+plot_layout(nrow=3)
-#ggsave("~/Documents/UMD_new/nih_rna/writeup/sex_age_distribution.png",width=4,height=8)
+#ggsave("sex_age_distribution.png",width=4,height=8)
 
 ## variance partition - exploratory (takes a while to run)
 
