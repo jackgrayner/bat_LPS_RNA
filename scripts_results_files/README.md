@@ -4,16 +4,20 @@
 Differential expression analysis R scripts for each species. The bat_analysis directory also includes the WGCNA R script.
 
 ### Data files
-cts_all.csv - raw counts for all bat samples
+cts_phases_3_to_7.csv - raw counts for all bat samples
 
-samples_all.csv - bat metadata for all samples 
+samples_phases_3_to_7.csv - bat metadata for all samples 
  - Rownames: Sample IDs (sample no. nested within sequencing batch). Note Phases 1 and 2 were not included in the reported analysis due to methodological issues (incubated at lower than body temperature).
  - Phase: Phase of project. Essentially reflects RNA library preparation batch.
  - Phase.batch: phase concated with sequencing batch (as some phases had to be split across multiple sequencing batches); used as confounding blocking variable in analysis.
- - Ban_Yr_Mo: concatenated band (i.e., bat ID), year and month of sampling
- - Trtmt: Code representing how the sample was treated (LPS0.1 = 5ul LPS added for final concentration of 0.1ug/ml, LPS_1 = 5ul LPS added for final concentration of 1ug/ml LPS, PBS = 5ul PBS added, 
- - Temp: temperature sample was kept at
- - Duration: duration for which sample was kept at Temp
+ - Univ.ID: phase concated with sample band.
+ - Band: Sample band (unique ID)
+ - Yr: Year sampled
+ - Mon: Month sampled
+ - Ban_Yr_Mo: concatenated band, year and month of sampling
+ - Trtmt: Code representing how the sample was treated (TH = 5ul LPS added for final concentration of 1ug/ml LPS, C0 = no treatment)
+ - Additive: What was added to the sample
+ - Incubation: Period of incubation at 38C before preservation
  - SampleTime: time blood sampled
  - DecTime: decimalised time blood sampled
  - Sex: individiual sex
