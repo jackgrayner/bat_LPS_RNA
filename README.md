@@ -1,6 +1,8 @@
+# Male-biased immune ageing in a polygynous bat
+
 ## Abstract
 
-Bats have attracted considerable recent interest for their longevity and ability to withstand infection by a range of pathogens, but few studies have examined immune responses as a function of age, sex, or social status. We investigated immune variation by comparing whole-blood transcriptomes of wild greater spear-nosed bats, Phyllostomus hastatus, before and after ex vivo exposure to lipopolysaccharide, a characteristic of gram-negative bacterial pathogens. This species exhibits an extreme harem-polygynous mating system, which has pervasive consequences on life history traits, including male-biased mortality. We observe strong interindividual variation in immune responses, with males and older bats each mounting stronger inflammatory responses. Males also show steeper patterns of age-related variation in immune profiles, suggesting their earlier mortality is associated with accelerated immunosenescence. We did not detect largescale differences in immune responses between males of different social status, suggesting that—unlike many primates—individual immune variation is not strongly influenced by social adversity. Our findings support recent calls for a more nuanced approach to understanding immune adaptations in bats that considers the multifarious ways in which species and individuals differ in ecology, resource allocation, and selection.
+Bats have attracted considerable interest for their extraordinary longevity and ability to withstand infection by a range of pathogens without major harm. Yet, little is known about the relationship between these two characteristics, or how they differ across individuals. We investigated sources of immune variation in wild greater spear-nosed bats, Phyllostomus hastatus, before and after ex vivo exposure to lipopolysaccharide, a membrane component of gram-negative bacteria. This species exhibits an extreme harem-polygynous mating system and strongly male-biased mortality, offering the valuable opportunity to explore effects of differences in life history and social status on immunity. We observe striking immunological variation associated with sex and age, with males and older bats mounting stronger inflammatory responses, but did not find evidence of strong social influences. Sex and age also interacted, revealing male-biased slopes of age-related variation in immunity, consistent with an association between mortality and accelerated immunosenescence. Our findings support recent calls for a nuanced approach to understanding immune adaptations and extended longevity in bats informed by individual and species-level differences in ecology, resource allocation, and selection. These widely overlooked sources of variation could offer valuable insights into connections between immunity and differences in resistance to disease, mortality, and age-related deterioration.
 
 ## Description of methods
 
@@ -10,7 +12,7 @@ Gene expression counts were quantified against a reference transcriptome for Phy
 
 ## Availability of sequencing data
 
-Raw reads are available from the NCBI SRA under the BioProject accession PRJNA1125049.
+Raw reads from newly collected data are available from the NCBI SRA under the BioProject accession PRJNA1125049.
 
 ## RNA-seq
 
