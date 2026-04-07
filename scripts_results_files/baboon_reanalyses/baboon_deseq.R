@@ -23,10 +23,8 @@ add_gene_info<-function(x){
   return(x)
 }
 
-
-setwd("~/Documents/UMD_new/nih_rna/baboon_reanalysis/")
-dir<-"~/Documents/UMD_new/nih_rna/baboon_reanalysis/"
-samples <- read.csv("SraRunTable.csv", header = TRUE)
+# dir<-"~/Documents/UMD_new/nih_rna/baboon_reanalysis/"
+# samples <- read.csv("SraRunTable.csv", header = TRUE)
 # files <- file.path(paste0(dir,"/kallisto/", samples$Run, "/abundance.h5"))
 # summary(all(file.exists(files)))
 # 
@@ -59,8 +57,4 @@ resultsNames(dds.bab)
 
 res.th.vs.c0<-add_gene_info(data.frame(results(dds.bab, name="treatment_NULL_vs_LPS",alpha=0.05)))
 write.csv(res.th.vs.c0,"baboon_LPS.csv",row.names=FALSE,quote=FALSE)
-
-bab.vsd<-assay(vst(dds.bab,blind=FALSE))
-write.csv(vsd,"~/Documents/UMD_new/nih_rna/baboon_reanalysis/baboon_vst.csv",row.names=TRUE,quote=FALSE)
-#vsd<-read.csv("~/Documents/UMD_new/nih_rna/baboon_reanalysis/baboon_vst.csv")
 
