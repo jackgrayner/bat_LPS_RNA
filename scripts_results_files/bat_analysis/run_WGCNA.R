@@ -29,8 +29,8 @@ library(WGCNA)
 library(DESeq2)
 library(flashClust)
 
-# samples.all.th<-read.csv("~/Documents/UMD_new/nih_rna/writeup/samples_all_th.csv",row.names = 1)
-# cts.all.th<-read.csv("~/Documents/UMD_new/nih_rna/writeup/cts_all_th.csv",row.names = 1)
+# samples_all_th.csv",row.names = 1)
+# cts.all.th<-read.csv("cts_all_th.csv",row.names = 1)
 # summary(colnames(cts.all.th)==rownames(samples.all.th))
 # 
 # dds.all.th <- DESeq(DESeqDataSetFromMatrix(
@@ -210,12 +210,11 @@ all.pca+stat_ellipse(level = 0.99)+theme(legend.position='left')+labs(tag="A")+g
   geom_point(alpha=0.75)+geom_smooth(method='lm')+scale_colour_manual(values=SexPalette)+
   ylab("blue module (N = 1653)")+theme(legend.position='none')+labs(tag="F")
 
-ggsave("/Users/jackrayner/Documents/UMD_new/nih_rna/writeup/v2/PCA_wgcna_sexage.svg",dpi=600,height=5,width=9)
-#ggsave("/Users/jackrayner/Documents/UMD_new/nih_rna/writeup/nodupes/PCA_wgcna_sexage.png",dpi=600,height=5,width=9)
-#ggsave("/Users/jackrayner/Documents/UMD_new/nih_rna/writeup/v2/wgcna_sexage_sexspecific_zscale.svg",dpi=600,height=4.5,width=6)
+ggsave("PCA_wgcna_sexage.svg",dpi=600,height=5,width=9)
+#ggsave("PCA_wgcna_sexage.png",dpi=600,height=5,width=9)
+#ggsave("wgcna_sexage_sexspecific_zscale.svg",dpi=600,height=4.5,width=6)
 
 g.go.green+g.go.yellow+g.go.blue
-
 
 go.OR<-clusterProfiler::simplify(enrichGO(gene = module_df[module_df$colors=="green",]$gene_id,
                                           universe = module_df$gene_id,#list of all genes
