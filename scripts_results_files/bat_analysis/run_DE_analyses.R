@@ -68,7 +68,7 @@ p7.pcdiff<-ggplot(pca.paired,aes(x=age.x,y=diff,colour=sex.x))+
   labs(colour="Sex",x="Age",y="PC1 difference (LPS - untreated)")
 
 p7.pca+labs(tag="A")+p7.pcdiff+labs(tag="B")
-#ggsave("~/Documents/UMD_new/nih_rna/writeup/paired_PC1_diff_sexage.png",dpi=600,height=3.5,width=8)
+#ggsave("paired_PC1_diff_sexage.png",dpi=600,height=3.5,width=8)
 
 ## run LM of PC1, testing sex and age effects
 lm.pca.paired<-lmer(diff~sex.x*age.x+(1|Phase.batch.x),data=pca.paired)
@@ -216,13 +216,13 @@ spp.lps.heatmap<-(pheatmap(imp.gene.lfc.t,cluster_rows = FALSE,cluster_cols = TR
 
 ## now create plots of correlations in LPS response across one-to-one orthologs
 
-bat.lfc<-read.csv("./ortho_dge/bat_ortho_dge.csv")
+bat.lfc<-read.csv("./bat_analysis/bat_ortho_dge.csv")
 bat.sig1<-bat.lfc[bat.lfc$sig,]$gene
-bab.lfc<-read.csv("./ortho_dge/baboon_ortho_dge.csv")%>% mutate(log2FoldChange=-log2FoldChange)#correct contrast direction
+bab.lfc<-read.csv("./baboon_reanalysis/baboon_ortho_dge.csv")%>% mutate(log2FoldChange=-log2FoldChange)#correct contrast direction
 bab.sig1<-bab.lfc[bab.lfc$sig,]$gene
-mac.lfc<-read.csv("./ortho_dge/macaque_ortho_dge.csv") %>% mutate(log2FoldChange=-log2FoldChange)
+mac.lfc<-read.csv("./macaque_reanalysis/macaque_ortho_dge.csv") %>% mutate(log2FoldChange=-log2FoldChange)
 mac.sig1<-mac.lfc[mac.lfc$sig,]$gene
-pig.lfc<-read.csv("./ortho_dge/pig_ortho_dge.csv")
+pig.lfc<-read.csv("./pig_reanalysis/pig_ortho_dge.csv")
 pig.sig1<-pig.lfc[pig.lfc$sig,]$gene
 
 bat.lfc2<-bat.lfc[,c("gene","log2FoldChange","eggNOG_OGs")] %>% `colnames<-`(c("batgene","bat","eggNOG_OGs"))
@@ -230,6 +230,7 @@ bab.lfc2<-bab.lfc[,c("gene","log2FoldChange","eggNOG_OGs")] %>% `colnames<-`(c("
 mac.lfc2<-mac.lfc[,c("gene","log2FoldChange","eggNOG_OGs")] %>% `colnames<-`(c("macgene","macaque","eggNOG_OGs"))
 pig.lfc2<-pig.lfc[,c("gene","log2FoldChange","eggNOG_OGs")] %>% `colnames<-`(c("piggene","pig","eggNOG_OGs"))
 
+#### merge all
 imp.gene.lfc<-left_join(bat.lfc2,pig.lfc2,by="eggNOG_OGs") %>% left_join(.,bab.lfc2,by='eggNOG_OGs') %>% left_join(.,mac.lfc2,by='eggNOG_OGs')
 rownames(imp.gene.lfc)<-imp.gene.lfc$batgene
 
@@ -245,12 +246,6 @@ imp.gene.lfc$bat.pig.sig<-paste(imp.gene.lfc$batgene %in% bat.sig1,imp.gene.lfc$
 imp.gene.lfc$bat.macaque.sig<-paste(imp.gene.lfc$batgene %in% bat.sig1,imp.gene.lfc$macgene %in% mac.sig1)
 imp.gene.lfc$bat.baboon.sig<-paste(imp.gene.lfc$batgene %in% bat.sig1,imp.gene.lfc$babgene %in% bab.sig1)
 
-g.cor.pig<-ggplot(imp.gene.lfc,aes(x=bat,y=pig))+cust.theme()+xlab("bat LogFC")+ylab("pig LogFC")+
-  geom_point(data=imp.gene.lfc[!imp.gene.lfc$bat.pig.sig=="FALSE FALSE",],aes(x=bat,y=pig,colour=bat.pig.sig),alpha=0.85,size=1.5)+
-  geom_hline(yintercept=0,linetype='dotted')+geom_vline(xintercept=0,linetype='dotted')+
-  theme(legend.position=c(4,2.5))+scale_colour_manual(values=c("#0C7C59","#444D5D","#EF6F6C"))#+#scale_color_manual(values=c("#888","#555"))+
-#geom_text_repel(aes(label=gene),size=2,fontface='italic',alpha=1,max.overlaps = 10,segment.size = 0.125)
-
 g.cor.mac<-ggplot(imp.gene.lfc,aes(x=bat,y=macaque))+cust.theme()+xlab("bat LogFC")+ylab("macaque LogFC")+
   geom_point(data=imp.gene.lfc[!imp.gene.lfc$bat.macaque.sig=="FALSE FALSE",],
              aes(x=bat,y=macaque,colour=bat.macaque.sig),alpha=0.85,size=1.5)+
@@ -258,20 +253,6 @@ g.cor.mac<-ggplot(imp.gene.lfc,aes(x=bat,y=macaque))+cust.theme()+xlab("bat LogF
   theme(legend.position=c(4,2.5))+scale_colour_manual(values=c("#0C7C59","#444D5D","#EF6F6C"))+
   ylim(c(-3.25,5))+
   geom_text_repel(aes(label=gene),size=2,fontface='italic',alpha=1,max.overlaps = 10,segment.size = 0.125)
-
-
-g.cor.bab<-ggplot(imp.gene.lfc,aes(x=bat,y=baboon))+cust.theme()+xlab("bat LogFC")+ylab("baboon LogFC")+
-  geom_point(data=imp.gene.lfc[!imp.gene.lfc$bat.baboon.sig=="FALSE FALSE",],aes(x=bat,y=baboon,colour=bat.baboon.sig),alpha=0.85,size=1.5)+
-  geom_hline(yintercept=0,linetype='dotted')+geom_vline(xintercept=0,linetype='dotted')+
-  theme(legend.position=c(4,2.5))+scale_colour_manual(values=c("#0C7C59","#444D5D","#EF6F6C"))#+#scale_color_manual(values=c("#888","#555"))+
-
-# summary(imp.gene.lfc[imp.gene.lfc$gene %in% c(bat.sig1,pig.sig1),]$bat*imp.gene.lfc[imp.gene.lfc$gene %in% c(bat.sig1,pig.sig1),]$pig>0)#105/(105+45)
-# summary(imp.gene.lfc[imp.gene.lfc$gene %in% c(bat.sig1,mac.sig1),]$bat*imp.gene.lfc[imp.gene.lfc$gene %in% c(bat.sig1,mac.sig1),]$mac>0)#105/(105+45)
-# summary(imp.gene.lfc[imp.gene.lfc$gene %in% c(bat.sig1,bab.sig1),]$bat*imp.gene.lfc[imp.gene.lfc$gene %in% c(bat.sig1,bab.sig1),]$bab>0)#151/(151+77)
-
-# spp.lps.heatmap /
-#  (g.cor.pig+g.cor.mac+g.cor.bab)+ plot_layout(heights=c(1,2))
-
 
 ## upset plot
 bat.sig.2<-imp.gene.lfc[imp.gene.lfc$batgene %in% bat.sig1 & imp.gene.lfc$bat>0,]$gene
@@ -307,14 +288,12 @@ upset.plot<-ggplot(tidy_up_spp,aes(x = spp,fill=unique)) + cust.theme()+
 
 
 ## plot fig 1
-(p7.pca+labs(tag="A")+g.volcano+labs(tag="B")) /
-  (go.all.th.up+labs(tag="C")+dotplot.kegg+labs(tag="D")) /
-  (as.ggplot(spp.lps.heatmap)+labs(tag="E")) /
-  (upset.plot+labs(tag="F")+g.cor.mac+labs(tag="G"))+ 
-  plot_layout(heights=c(1.4,1,1,1.4))
-
-ggsave("fig1_new.svg",height=12,width=12)
-
+ggsave("fig1_vert_pan1.svg",height=11,width=8,plot=
+         grid.arrange(p7.pca+labs(tag="A"),g.volcano+labs(tag="B"),
+                      go.all.th.up+labs(tag="D"),dotplot.kegg+labs(tag="E"),
+                      upset.plot+labs(tag="F"),g.cor.mac+labs(tag="G"),heights=c(1,0.9,1)))
+ggsave("fig1_vert_pan2.svg",height=11,width=3,plot=
+         (as.ggplot(spp.lps.heatmap.vert)+labs(tag="C")))
 
 ## test overrepresentation of shared/unique LPS-responsive genes
 gg.up.df2<-data.frame(bat=rownames(imp.gene.lfc) %in% bat.sig.2,
@@ -463,7 +442,9 @@ write.csv(dds.trt.c0.sex,"./results_files/phases3-7_C0_sex_effect.csv",row.names
 #test sex and sex effects across all TH samples
 dds.all.th <- DESeq(DESeqDataSetFromMatrix(
   countData = round(cts.all.th),
+  #countData = round(cts.all.th[,!is.na(samples.all.th$lnNLR)]),#for running lnNLR model
   colData = samples.all.th,
+  #colData = samples.all.th[!is.na(samples.all.th$lnNLR),],#for running lnNLR model
   design= ~ Sex+Age+#lnNLR+#including lnNLR or not has massive effect on sex-biased genes
     Phase))
 resultsNames(dds.all.th)
@@ -499,7 +480,7 @@ sex.vol + go.th.sex.m + go.th.sex.f + age.vol + go.th.age.up + go.th.age.dn+
               46
               ")
 
-ggsave('~/Documents/UMD_new/nih_rna/writeup/scripts_results_files/interindividual_var_sex_age.svg',dpi=600,height=8.5,width=9.5)
+ggsave('interindividual_var_sex_age.svg',dpi=600,height=8.5,width=9.5)
 
 #are sex-biased genes overrepresented for LPS-affected genes
 dds.trt.th.sex<-dds.trt.th.sex[!is.na(dds.trt.th.sex$padj),]
@@ -540,8 +521,8 @@ dds.trt.th.age.m<-add_gene_info(data.frame(results(dds.all.th.m, name="ss.age",a
 
 #plot_GO_overrep_upreg(dds.trt.th.age.f)+plot_GO_overrep_upreg(dds.trt.th.age.m)
 #plot_GO_overrep_downreg(dds.trt.th.age.f)+plot_GO_overrep_downreg(dds.trt.th.age.m)
-#write.csv(dds.trt.th.sex.f,"./results_files/phases3-7_TH_female_age_effect.csv",row.names = FALSE)
-#write.csv(dds.trt.th.sex.m,"./results_files/phases3-7_TH_male_age_effect.csv",row.names = FALSE)
+#write.csv(dds.trt.th.sex.f,"phases3-7_TH_female_age_effect.csv",row.names = FALSE)
+#write.csv(dds.trt.th.sex.m,"phases3-7_TH_male_age_effect.csv",row.names = FALSE)
 
 dds.th.age.ss<-merge(dds.trt.th.age.f,dds.trt.th.age.m,by='gene')
 dds.th.age.ss.concord<-dds.th.age.ss[dds.th.age.ss$log2FoldChange.x*dds.th.age.ss$log2FoldChange.y>0 & 
@@ -549,7 +530,6 @@ dds.th.age.ss.concord<-dds.th.age.ss[dds.th.age.ss$log2FoldChange.x*dds.th.age.s
 t.test(abs(dds.th.age.ss.concord$log2FoldChange.x),abs(dds.th.age.ss.concord$log2FoldChange.y),paired=TRUE)
 (mean(2^abs(dds.th.age.ss.concord$log2FoldChange.y)-2^abs(dds.th.age.ss.concord$log2FoldChange.x)))
 #sd(2^abs(dds.th.age.ss.concord$log2FoldChange.y)-2^abs(dds.th.age.ss.concord$log2FoldChange.x))/sqrt(120)
-
 
 ## run sex-specific models, WITHOUT sex-specific z-scaling of ages
 dds.all.th.f <- DESeq(DESeqDataSetFromMatrix(
