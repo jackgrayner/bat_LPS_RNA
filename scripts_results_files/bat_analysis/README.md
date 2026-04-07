@@ -1,5 +1,8 @@
 ## Differential expression (DE) analysis of RNA-seq data from untreated and LPS-treated blood of Phyllostomus hastatus
 
+## R scripts
+Order of processing is as follows:
+
 ### load_data_functions_summarise.R
  00. load packages, define functions
  01. read, filter, organise data
@@ -16,7 +19,7 @@
 ### run_WGCNA.R
  09. WGCNA module analyses of LPS-treated samples
 
-### Data files
+## Data files
 cts_phases_3_to_7.csv - raw counts for all bat samples
 
 samples_phases_3_to_7.csv - bat metadata for all samples 
@@ -44,7 +47,7 @@ samples_phases_3_to_7.csv - bat metadata for all samples
  - STATUS: male status (bachelor or harem)
  - LN.N.L.: natural log of the neutrophil-to-lymphocyte ratio for the blood sample
 
-### Results files
+## Results files
 
 phase7_paired_th_vs_c0.csv - Results of differential expression analysis between paired untreated (c0) and LPS-treated (TH) samples
 
