@@ -156,8 +156,8 @@ plot_volcano<-function(df){
 # 01. read, filter, organise data
 #####################
 
-samples.all<-read.csv("samples_phases_3_to_7.csv",h=T,row.names=1)
-cts.all<-read.csv("cts_all.csv",h=T,row.names=1)
+samples.all<-read.csv("Ph_LPS_samples.csv",h=T,row.names=1)
+cts.all<-read.csv("Ph_LPS_cts.csv",h=T,row.names=1)
 summary(rownames(samples.all)==colnames(cts.all))#check sample order matches
 
 #### IF REMOVING DUPLICATE BANDS
