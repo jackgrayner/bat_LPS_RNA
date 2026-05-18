@@ -19,7 +19,7 @@
 
 #####################
 
-## script assumes you have already run load_data_functions_summarise.R
+# nb. script assumes load_data_functions_summarise.R already run.
 
 #####################
 # 09. WGCNA module analyses of LPS-treated samples
@@ -29,22 +29,22 @@ library(WGCNA)
 library(DESeq2)
 library(flashClust)
 
-# samples_all_th.csv",row.names = 1)
-# cts.all.th<-read.csv("cts_all_th.csv",row.names = 1)
-# summary(colnames(cts.all.th)==rownames(samples.all.th))
-# 
-# dds.all.th <- DESeq(DESeqDataSetFromMatrix(
-#   countData = round(cts.all.th),
-#   colData = samples.all.th,
-#   design= ~ Sex+Age+Phase))
-# 
-# vst<-data.frame(assay(vst(dds.all.th,blind=FALSE)))
-# vst = ComBat(dat=vst, batch=samples.all.th$Phase, mod=NULL, par.prior=TRUE, prior.plots=FALSE)
-# 
-# write.csv(vst,"vst_phases3_7_TH_combat.csv",quote=FALSE)
+summary(colnames(cts.all.th)==rownames(samples.all.th))
 
-samples.all.th<-read.csv("samples_all_th.csv",row.names = 1)
+dds.all.th <- DESeq(DESeqDataSetFromMatrix(
+  countData = round(cts.all.th),
+  colData = samples.all.th,
+  design= ~ Sex+Age+Phase))
+
+#take variance stabilised counts
+vst<-data.frame(assay(vst(dds.all.th,blind=FALSE)))
+#renmove phase effects
+vst = ComBat(dat=vst, batch=samples.all.th$Phase, mod=NULL, par.prior=TRUE, prior.plots=FALSE)
+write.csv(vst,"vst_phases3_7_TH_combat.csv",quote=FALSE)
+
 datExpr<-read.csv("vst_phases3_7_TH_combat.csv",row.names = 1)
+datTraits = samples.all.th
+table(rownames(datTraits)==rownames(datExpr)) 
 
 rowvars.dat<-(rowVars(as.matrix(datExpr)))
 summary(rowvars.dat>quantile(rowvars.dat,0.5))
@@ -66,11 +66,6 @@ if (!gsg$allOK){
 
 gsg = goodSamplesGenes(datExpr, verbose = 3)
 gsg$allOK
-
-#Create an object called "datTraits" that contains your trait data
-datTraits = samples.all.th
-head(datTraits)
-table(rownames(datTraits)==rownames(datExpr)) #should return TRUE if datasets align correctly, otherwise your names are out of order
 
 powers = c(c(1:10), seq(from =10, to=30, by=1)) #choosing a set of soft-thresholding powers
 sft = pickSoftThreshold(datExpr, powerVector=powers, verbose =5, networkType="signed") #call network topology analysis function
@@ -128,23 +123,16 @@ module_df <- data.frame(
   colors = labels2colors(netwk$colors)
 )
 
-
 write_delim(module_df,
             file = "gene_modules.txt",
             delim = "\t")
-
 
 # Get Module Eigengenes per cluster
 MEs0 <- moduleEigengenes(datExpr, mergedColors)$eigengenes
 
 # Reorder modules so similar modules are next to each other
-library(dplyr)
 MEs0 <- orderMEs(MEs0)
 module_order = names(MEs0) %>% gsub("ME","", .)
-
-# Add treatment names
-#MEs0$treatment = row.names(MEs0)
-#MEs0$treatment = samples.all.th$Sex
 
 datTraits[datTraits$Sex=="F",]$Sex<-2
 datTraits[datTraits$Sex=="M",]$Sex<-1
@@ -153,16 +141,17 @@ moduleTraitCor = cor(MEs0, datTraits, use= "p")
 moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nrow(datExpr))
 moduleTraitPvalue[,1]=p.adjust(moduleTraitPvalue[,1])
 moduleTraitPvalue[,2]=p.adjust(moduleTraitPvalue[,2])
-moduleTraitPvalue<0.005
 moduleTraitPvalue<0.05
+moduleTraitPvalue.df<-data.frame(moduleTraitPvalue)
+sig.mods<-rownames(
+  moduleTraitPvalue.df[(moduleTraitPvalue.df$Sex<0.05 | moduleTraitPvalue.df$Age<0.05),]
+)
 
 textMatrix= paste(signif(moduleTraitCor, 2), "\n(",
                   signif(moduleTraitPvalue, 1), ")", sep= "")
 dim(textMatrix)= dim(moduleTraitCor)
-#par(mar= c(6, 8.5, 3, 3))
 
 #display the corelation values with a heatmap plot
-#INCLUE THE NEXT LINE TO SAVE TO FILE
 pdf('heatmap.pdf')
 labeledHeatmap(Matrix= moduleTraitCor,
                xLabels= names(datTraits),
@@ -180,43 +169,41 @@ dev.off()
 
 MEs0$Sex<-datTraits$Sex
 MEs0$Est.Age<-datTraits$Age
-#MEs0$Est.Age<-datTraits$ss.age
-MEs0$Phase<-datTraits$Phase
-MEs0$Band<-datTraits$Band
 
 MEs0[MEs0$Sex==1,]$Sex="M"
 MEs0[MEs0$Sex==2,]$Sex="F"
 
-library(patchwork)
-nrow(module_df[module_df$colors=="green",])
-nrow(module_df[module_df$colors=="pink",])
-nrow(module_df[module_df$colors=="yellow",])
-nrow(module_df[module_df$colors=="blue",])
-
 #run main scrpt first for pca plots
+MEs0$Est.Age<-samples.all.th$Est.Age
 
-#MEs0<-MEs0[!duplicated(MEs0$Band),]
-all.pca+stat_ellipse(level = 0.99)+theme(legend.position='left')+labs(tag="A")+g.pcdiff.th+theme(legend.position='none')+labs(tag="B")+
-  ggplot(MEs0,aes(x=Est.Age,y=MEpink,colour=Sex))+cust.theme()+
-  geom_point(alpha=0.75)+geom_smooth(method='lm')+scale_colour_manual(values=SexPalette)+
-  ylab("pink module (N = 165)")+labs(tag="C")+
-  ggplot(MEs0,aes(x=Est.Age,y=MEgreen,colour=Sex))+cust.theme()+labs(tag="D")+
-  geom_point(alpha=0.75)+geom_smooth(method='lm')+scale_colour_manual(values=SexPalette)+
-  ylab("green module (N = 424)")+theme(legend.position='none')+
-  ggplot(MEs0,aes(x=Est.Age,y=MEyellow,colour=Sex))+cust.theme()+labs(tag="E")+
-  geom_point(alpha=0.75)+geom_smooth(method='lm')+scale_colour_manual(values=SexPalette)+
-  ylab("yellow module (N = 732)")+theme(legend.position='none')+
-  ggplot(MEs0,aes(x=Est.Age,y=MEblue,colour=Sex))+cust.theme()+labs(tag="F")+
-  geom_point(alpha=0.75)+geom_smooth(method='lm')+scale_colour_manual(values=SexPalette)+
-  ylab("blue module (N = 1653)")+theme(legend.position='none')+labs(tag="F")
+sig.mods
+nrow(module_df[module_df$colors==gsub("ME","",sig.mods[1]),])
+nrow(module_df[module_df$colors==gsub("ME","",sig.mods[2]),])
+nrow(module_df[module_df$colors==gsub("ME","",sig.mods[3]),])
+nrow(module_df[module_df$colors==gsub("ME","",sig.mods[4]),])
 
-ggsave("PCA_wgcna_sexage.svg",dpi=600,height=5,width=9)
-#ggsave("PCA_wgcna_sexage.png",dpi=600,height=5,width=9)
-#ggsave("wgcna_sexage_sexspecific_zscale.svg",dpi=600,height=4.5,width=6)
+all.pca+stat_ellipse(level = 0.99,aes(colour=trt),show.legend = FALSE,linewidth=0.4)+scale_colour_manual(values=TrtPalette)+
+  theme(legend.position='left')+labs(tag="A",fill='Treatment',subtitle="PCA - all")+
+  g.pcdiff.th+theme(legend.position='none')+labs(tag="B",x="Est.Age",y="PC1",subtitle = "PC1 - all")+
+  p7.pcdiff+labs(tag="D",subtitle=expression(PC1[LPS] - PC1[untreated]))+
+  ggplot(MEs0,aes(x=Est.Age,y=MEblue,fill=Sex,colour=Sex))+cust.theme()+theme(legend.position='none')+
+  geom_point(alpha=0.75,shape=21,stroke=0.25,aes(fill=Sex),size=2,colour='black')+geom_smooth(method='lm')+scale_colour_manual(values=SexPalette)+scale_fill_manual(values=SexPalette)+
+  ylab("Blue module (N = 1648)")+labs(tag="C",subtitle="\"Inflammation\" module")+
+  #ggplot(MEs0,aes(x=Est.Age,y=MEmagenta,fill=Sex,colour=Sex))+cust.theme()+labs(tag="D")+
+  #geom_point(alpha=0.75,shape=21,stroke=0.25,aes(fill=Sex),size=2,colour='black')+geom_smooth(method='lm')+scale_colour_manual(values=SexPalette)+scale_fill_manual(values=SexPalette)+
+  #ylab("Magenta module (N = 97)")+theme(legend.position='none')+
+  ggplot(MEs0,aes(x=Est.Age,y=MEblack,fill=Sex,colour=Sex))+cust.theme()+labs(tag="E",subtitle="\"B cell activation\" module")+
+  geom_point(alpha=0.75,shape=21,stroke=0.25,aes(fill=Sex),size=2,colour='black')+geom_smooth(method='lm')+scale_colour_manual(values=SexPalette)+scale_fill_manual(values=SexPalette)+
+  ylab("Black module (N = 232)")+theme(legend.position='none')+
+  ggplot(MEs0,aes(x=Est.Age,y=MEred,fill=Sex,colour=Sex))+cust.theme()+labs(tag="F",subtitle="\"T cell activation\" module")+
+  geom_point(alpha=0.75,shape=21,stroke=0.25,aes(fill=Sex),size=2,colour='black')+geom_smooth(method='lm')+scale_colour_manual(values=SexPalette)+scale_fill_manual(values=SexPalette)+
+  ylab("Red module (N = 388)")+theme(legend.position='none')+labs(tag="F")
 
-g.go.green+g.go.yellow+g.go.blue
+ggsave("PCA_wgcna_sexage.svg",dpi=600,height=5.5,width=9)
+#ggsave("PCA_wgcna_sexage_nodupes.svg",dpi=600,height=5,width=9)
 
-go.OR<-clusterProfiler::simplify(enrichGO(gene = module_df[module_df$colors=="green",]$gene_id,
+
+go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="blue",]$gene_id,
                                           universe = module_df$gene_id,#list of all genes
                                           keyType = "SYMBOL",
                                           OrgDb = organism,
@@ -225,9 +212,20 @@ go.OR<-clusterProfiler::simplify(enrichGO(gene = module_df[module_df$colors=="gr
                                           pvalueCutoff = 0.05,
                                           readable = TRUE),cutoff=0.7,by = "p.adjust",select_fun = min,
                                  measure = "Wang",semData = NULL)@result
-g.go.green<-plot_GO_fun(go.OR)#B cell stuff
+g.go.blue<-plot_GO_fun(go.OR)#B cell stuff
 
-go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="pink",]$gene_id,
+go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="magenta",]$gene_id,
+                         universe = module_df$gene_id,#list of all genes
+                         keyType = "SYMBOL",
+                         OrgDb = organism,
+                         ont = "BP",
+                         pAdjustMethod = "BH",
+                         pvalueCutoff = 1,
+                         readable = TRUE),cutoff=0.7,by = "p.adjust",select_fun = min,
+                measure = "Wang",semData = NULL)@result
+g.go.magenta<-plot_GO_fun(go.OR)
+
+go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="black",]$gene_id,
                          universe = module_df$gene_id,#list of all genes
                          keyType = "SYMBOL",
                          OrgDb = organism,
@@ -236,9 +234,9 @@ go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="pink",]$gene_id,
                          pvalueCutoff = 0.05,
                          readable = TRUE),cutoff=0.7,by = "p.adjust",select_fun = min,
                 measure = "Wang",semData = NULL)@result
-go.go.pink<-plot_GO_fun(go.OR)
+g.go.black<-plot_GO_fun(go.OR)#T cell stuff
 
-go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="yellow",]$gene_id,
+go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="red",]$gene_id,
                          universe = module_df$gene_id,#list of all genes
                          keyType = "SYMBOL",
                          OrgDb = organism,
@@ -247,33 +245,34 @@ go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="yellow",]$gene_id,
                          pvalueCutoff = 0.05,
                          readable = TRUE),cutoff=0.7,by = "p.adjust",select_fun = min,
                 measure = "Wang",semData = NULL)@result
-g.go.yellow<-plot_GO_fun(go.OR)#T cell stuff
+g.go.red<-plot_GO_fun(go.OR)#inflammation
 
-go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="blue",]$gene_id,
-                         universe = module_df$gene_id,#list of all genes
-                         keyType = "SYMBOL",
-                         OrgDb = organism,
-                         ont = "BP",
-                         pAdjustMethod = "BH",
-                         pvalueCutoff = 0.05,
-                         readable = TRUE),cutoff=0.7,by = "p.adjust",select_fun = min,
-                measure = "Wang",semData = NULL)@result
-g.go.blue<-plot_GO_fun(go.OR)#inflammation
+g.go.blue+ggtitle("Blue module")+
+  #g.go.magenta+ggtitle("Magenta module")+
+  g.go.black+ggtitle("Black module")+
+  g.go.red+ggtitle("Red module")+plot_layout(nrow=2)
 
-go.go.pink+ggtitle("Pink module")+
-  g.go.green+ggtitle("Green module")+
-  g.go.blue+ggtitle("Blue module")+
-  g.go.yellow+ggtitle("Yellow module")
-
-ggsave("modules_GO.png",height=7,width=10)
+ggsave("modules_GO.png",height=6,width=10)
+ggsave("modules_GO.pdf",height=7,width=10)
 
 library(lme4)
-car::Anova(lmer(MEpink~Sex+Est.Age+(1|Phase),data=MEs0))
-car::Anova(lmer(MEgreen~Sex*Est.Age+(1|Phase),data=MEs0),type="III")
-car::Anova(lmer(MEyellow~Sex*Est.Age+(1|Phase),data=MEs0),type="III")
-car::Anova(lmer(MEblue~Sex*Est.Age+(1|Phase),data=MEs0),type="III")
+car::Anova(lm(MEblue~Sex*Est.Age,data=MEs0),type="II")
+car::Anova(lm(MEmagenta~Sex*Est.Age,data=MEs0),type="II")
+car::Anova(lm(MEblack~Sex*Est.Age,data=MEs0),type="II")
+car::Anova(lm(MEred~Sex*Est.Age,data=MEs0),type="III")
+
+car::Anova(lm(MEblue~Est.Age,data=MEs0[MEs0$Sex=="M",]),type="II")
+car::Anova(lm(MEblue~Est.Age,data=MEs0[MEs0$Sex=="F",]),type="II")
+car::Anova(lm(MEmagenta~Est.Age,data=MEs0[MEs0$Sex=="M",]),type="II")
+car::Anova(lm(MEblack~Est.Age,data=MEs0[MEs0$Sex=="M",]),type="II")
+car::Anova(lm(MEred~Est.Age,data=MEs0[MEs0$Sex=="M",]),type="II")
+
+
+
+sig.mods1<-cbind(MEs0$MEblue,MEs0$MEmagenta,MEs0$MEblack,MEs0$MEred)
+man1<-manova(sig.mods1~Sex*Est.Age,data=MEs0)
+summary(man1)
 
 for (col in colnames(MEs0)){
   car::Anova(lm(col ~ Sex * Age,data=MEs0),type="III")
 }
-
