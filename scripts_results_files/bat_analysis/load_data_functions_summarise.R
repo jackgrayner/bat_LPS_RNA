@@ -16,7 +16,6 @@
 # run_WGCNA.R
 ## 09. WGCNA module analyses of LPS-treated samples
 
-
 #####################
 
 ## load libraries and set working directory
@@ -38,7 +37,7 @@ library(ggbeeswarm)
 library(ggplotify)
 library(pheatmap)
 library(ggupset)
-library(tidyverse, warn.conflicts = FALSE)
+library(tidyverse)
 
 ## create functions and global variables for use in analysis
 alpha=0.05
@@ -98,17 +97,17 @@ plot_GO_fun<-function(go.OR){
   return(
     addSmallLegend(
       ggplot(go.OR,aes(x=-log10(p.adjust),y=Description,fill=-log10(p.adjust)))+
-        theme_minimal()+theme(axis.title.y=element_blank(),panel.grid=element_blank(),plot.background=element_rect(fill='white',colour='white'),
-                              panel.background=element_rect(fill="white",colour='white',linewidth = 0.25),panel.border = element_blank())+
+        theme_minimal()+
+        theme(axis.title.y=element_blank(),panel.grid=element_blank(),
+              plot.background=element_rect(fill='white',colour='white'),
+              panel.background=element_rect(fill="white",colour='white',linewidth = 0.25),
+              panel.border = element_blank(),legend.direction = "horizontal",legend.position='top')+
         geom_segment(aes(x=min1,xend=-log10(p.adjust),y=Description,group=Description),colour="#999",linewidth=0.5)+
         geom_point(aes(size=Count),shape=21)+
         scale_fill_gradient(low = "#eddd8e", high = "#ba3636", na.value = NA)+
         #scale_fill_viridis(option="A")+
         scale_size(range=c(3,7),limits=c(min2,max2))+
-        # theme(axis.title.y=element_blank(),legend.title=element_text(size=10),axis.ticks.y=element_line(),
-        #       legend.position='right',panel.grid=element_blank(),plot.background=element_rect(fill='white',colour='white'),
-        #       panel.background=element_rect(fill="#fcfbfa",colour='black',linewidth = 0.25),axis.text.y=element_text(size=8.5),
-        #       legend.frame = element_rect(color = "#555555", size = 0.2))+
+
         xlab("-log10(Padj)")+ guides(fill = "none")
     )
   )
@@ -156,10 +155,24 @@ plot_volcano<-function(df){
 
 # 01. read, filter, organise data
 #####################
-# 01. READ. FILTER, ORGANISE DATA
 
 samples.all<-read.csv("samples_phases_3_to_7.csv",h=T,row.names=1)
-cts.all<-read.csv("cts_phases_3_to_7.csv",h=T,row.names=1)
+cts.all<-read.csv("cts_all.csv",h=T,row.names=1)
+summary(rownames(samples.all)==colnames(cts.all))#check sample order matches
+
+#### IF REMOVING DUPLICATE BANDS
+#samples.all$Band.Trt<-paste0(samples.all$Band,"_",samples.all$Trtmt)
+#samples.all<-samples.all[!duplicated(samples.all$Band.Trt),]
+#cts.all<-cts.all[,colnames(cts.all) %in% rownames(samples.all)]
+
+#### check globin/rRNA related expression
+rna.glob.seqs<-c("LOC123804861","LOC123809810","LOC123809121","LOC123809122","LOC123809123","LOC123819184","LOC123819185")
+rna.glob.seqs.cts<-data.frame(prop=colSums(cts.all[rownames(cts.all) %in% rna.glob.seqs,])/colSums(cts.all),phase=samples.all$Phase.batch)
+summary(rna.glob.seqs.cts$prop)
+g.pha.ribo<-ggplot(rna.glob.seqs.cts,aes(x=prop,fill=phase))+geom_histogram()+theme_minimal()+facet_grid(phase~.)
+
+#### remove those sequences from cts
+cts.all<-cts.all[!rownames(cts.all) %in% rna.glob.seqs,]
 
 ## scale age, ensure variables are treated appropriately (e.g., band and year treated as factors)
 samples.all$Age<-scale(samples.all$Est.Age)
@@ -168,30 +181,29 @@ samples.all$Yr<-(factor(samples.all$Yr))
 colnames(samples.all)[which(colnames(samples.all)=="LN.N.L..")]<-"lnNLR"
 samples.all$Phase<-samples.all$Phase.batch
 samples.all$Batch<-samples.all$Phase
-samples.all$ID<-samples.all$Band
 
-## make subsets
+## make subsets for use in analysis
+cts.all<-cts.all[,samples.all$Trtmt %in% c("C0","TH")]
+samples.all<-samples.all[samples.all$Trtmt %in% c("C0","TH"),]
 cts.p7<-cts.all[,samples.all$Phase=="Phase7.1" | samples.all$Phase=="Phase7.2"]
 samples.p7<-samples.all[samples.all$Phase=="Phase7.1"| samples.all$Phase=="Phase7.2",]
 cts.all.th<-cts.all[,samples.all$Trtmt=="TH"]
 samples.all.th<-samples.all[samples.all$Trtmt=="TH",]
 cts.all.c0<-cts.all[,samples.all$Trtmt=="C0"]
 samples.all.c0<-samples.all[samples.all$Trtmt=="C0",]
-cts.all<-cts.all[,samples.all$Trtmt %in% c("C0","TH")]
-samples.all<-samples.all[samples.all$Trtmt %in% c("C0","TH"),]
 
 #####################
 # 02. SUMMARY PLOTS
 
 ## plot age distributions
-g.ages.th<-ggplot(samples.all.th,aes(x=Est.Age,fill=Sex))+cust.theme()+geom_histogram(alpha=0.75,colour='black')+
+g.ages.th<-ggplot(samples.all.th,aes(x=Est.Age,fill=Sex))+cust.theme()+geom_histogram(alpha=0.75,colour='black',bins=20)+
   scale_fill_manual(values=SexPalette)+facet_grid(Sex~.)+theme(legend.position='none')+
   ggtitle("LPS-treated samples")
-g.ages.c0<-ggplot(samples.all.c0,aes(x=Est.Age,fill=Sex))+cust.theme()+geom_histogram(alpha=0.75,colour='black')+
+g.ages.c0<-ggplot(samples.all.c0,aes(x=Est.Age,fill=Sex))+cust.theme()+geom_histogram(alpha=0.75,colour='black',bins=20)+
   scale_fill_manual(values=SexPalette)+facet_grid(Sex~.)+theme(legend.position='none')+
   ggtitle("Untreated samples")
 g.ages.paired<-ggplot(samples.all[samples.all$Phase %in% c("Phase7.1","Phase7.2") & samples.all$Trtmt=="C0",],aes(x=Est.Age,fill=Sex))+
-  cust.theme()+geom_histogram(alpha=0.75,colour='black')+
+  cust.theme()+geom_histogram(alpha=0.75,colour='black',bins=20)+
   scale_fill_manual(values=SexPalette)+facet_grid(Sex~.)+theme(legend.position='none')+
   ggtitle("Paired individuals")
 
