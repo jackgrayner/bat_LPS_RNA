@@ -39,7 +39,7 @@ dds.all.th <- DESeq(DESeqDataSetFromMatrix(
 #take variance stabilised counts
 vst<-data.frame(assay(vst(dds.all.th,blind=FALSE)))
 #renmove phase effects
-vst = ComBat(dat=vst, batch=samples.all.th$Phase, mod=NULL, par.prior=TRUE, prior.plots=FALSE)
+vst = ComBat(dat=vst, batch=samples.all.th$Phase.batch, mod=NULL, par.prior=TRUE, prior.plots=FALSE)
 write.csv(vst,"vst_phases3_7_TH_combat.csv",quote=FALSE)
 
 datExpr<-read.csv("vst_phases3_7_TH_combat.csv",row.names = 1)
