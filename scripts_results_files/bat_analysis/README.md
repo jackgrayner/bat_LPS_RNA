@@ -50,10 +50,16 @@ samples_phases_3_to_7.csv - bat metadata for all samples
 ## Results files
 
 phase7_paired_th_vs_c0.csv - Results of differential expression analysis between paired untreated (c0) and LPS-treated (TH) samples
+- phase7_paired_th_vs_c0_female.csv - As above, including only female samples
+- phase7_paired_th_vs_c0_male.csv - As above, including only male samples
 
 phases3-7_TH_age_effect.csv - Results of differential expression analysis testing differences between ages among LPS-treated transcriptomes
 
 phases3-7_TH_sex_effect.csv - Results of differential expression analysis testing differences between sexes among LPS-treated transcriptomes
+
+phases3-7_C0_age_effect.csv - Results of differential expression analysis testing differences between ages among untreated transcriptomes
+
+phases3-7_C0_sex_effect.csv - Results of differential expression analysis testing differences between sexes among untreated transcriptomes
 
 bat_ortho_dge.csv - LPS effect results with EggNog IDs added
 
