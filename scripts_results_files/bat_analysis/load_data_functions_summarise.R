@@ -38,6 +38,8 @@ library(ggplotify)
 library(pheatmap)
 library(ggupset)
 library(tidyverse)
+library(lme4)
+library(car)
 
 ## create functions and global variables for use in analysis
 alpha=0.05

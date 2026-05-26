@@ -112,7 +112,8 @@ dotplot.kegg<-ggplot(kk2,aes(x=-log10(p.adjust),y=Description,fill=-log10(p.adju
   xlim(c(min1,max1))+xlab("-log10(Padj)")+ guides(fill = "none")
 
 #####################
-# 03.5. PCA of all samples
+# 03.5. PCA of all samples (not just paired)
+
 ## Run model
 dds.all <- DESeq(DESeqDataSetFromMatrix(
   countData = round(cts.all),
@@ -120,14 +121,24 @@ dds.all <- DESeq(DESeqDataSetFromMatrix(
   design= ~ 1))
 resultsNames(dds.all)
 
-pca.trt<-plotPCA(vst(dds.all),intgroup=c("Sex","Est.Age","Band","Phase.batch","Trtmt"),returnData=TRUE,ntop=1000)
+pca.trt<-plotPCA(vst(dds.all),intgroup=c("Sex","Est.Age","Band","Phase.batch","Trtmt","lnNLR"),returnData=TRUE,ntop=1000)
 plotPCA(vst(dds.all),intgroup="Trtmt",returnData=FALSE,ntop=1000) #to get %var explained
 pca.trt$trt<-factor(pca.trt$Trtmt)
 levels(pca.trt$trt)=c("none","LPS")
 
+#plot PCA (PC1 negated for interpreation - so higher PC1 = more different from untreated samples)
 all.pca<-ggplot(pca.trt,aes(x=-PC1,y=PC2,fill=trt))+
   cust.theme()+
   geom_point(size=2.75,shape=21,stroke=0.35)+scale_fill_manual(values=TrtPalette)+
+  xlab("PC1 (47% var.)")+ylab("PC2 (8% var.)")+
+  theme(legend.position='left')+labs(fill="Treatment")
+
+#plot differences in PC1 between LPS-treated samples
+g.pcdiff.th<-ggplot(pca.trt[pca.trt$Trtmt=="TH",],aes(x=Est.Age,y=-PC1,fill=Sex,colour=Sex))+
+  cust.theme()+geom_smooth(method='lm')+
+  geom_point(alpha=0.75,shape=21,stroke=0.25,aes(fill=Sex),size=2,colour='black')+
+  scale_fill_manual(values=SexPalette)+
+  scale_colour_manual(values=SexPalette)+
   xlab("PC1 (47% var.)")+ylab("PC2 (8% var.)")+
   theme(legend.position='left')+labs(fill="Treatment")
 
@@ -148,9 +159,9 @@ lps<-lps$V1
 
 ## bat LPS results come from above model, others from independent analyses of existing data
 bat.lfc<-res.th.vs.c0
-bab.lfc<-read.csv("./baboon_reanalysis/baboon_LPS.csv") %>% mutate(log2FoldChange=-log2FoldChange)#correct contrast direction
-mac.lfc<-read.csv("./macaque_reanalysis/macaque_LPS.csv") %>% mutate(log2FoldChange=-log2FoldChange)
-pig.lfc<-read.csv("./pigs_reanalysis/pig_LPS.csv")
+bab.lfc<-read.csv("../baboon_reanalysis/baboon_LPS.csv") %>% mutate(log2FoldChange=-log2FoldChange)#correct contrast direction
+mac.lfc<-read.csv("../macaque_reanalysis/macaque_LPS.csv") %>% mutate(log2FoldChange=-log2FoldChange)
+pig.lfc<-read.csv("../pig_reanalysis/pig_LPS.csv")
 
 ## define significant genes in each spp.
 bat.sig<-res.th.vs.c0[res.th.vs.c0$padj<0.05  & !is.na(res.th.vs.c0$padj),]$gene
@@ -180,28 +191,23 @@ breaks <- c(
   seq(0, max(imp.gene.lfc, na.rm = TRUE), length.out = 20)[-1]
 )
 
-## transpose dataframe, add significant annotations
-imp.gene.lfc.t<-data.frame(t(imp.gene.lfc))
-anno_col.lps<-data.frame(lps.gene=factor(as.integer(colnames(imp.gene.lfc.t) %in% lps)))
-rownames(anno_col.lps)<-colnames(imp.gene.lfc.t)
-anno_col.dge<-data.frame(macaque=case_when(colnames(imp.gene.lfc.t) %in% mac.sig ~ "Y",.default = "N"),
-                         baboon=case_when(colnames(imp.gene.lfc.t) %in% bab.sig ~ "Y",.default = "N"),
-                         pig=case_when(colnames(imp.gene.lfc.t) %in% pig.sig ~ "Y",.default = "N"),
-                         bat=case_when(colnames(imp.gene.lfc.t) %in% bat.sig ~ "Y",.default = "N")
+## transpose dataframe, add significance annotations
+imp.gene.lfc.t<-data.frame((imp.gene.lfc))
+anno_col.lps<-data.frame(lps.gene=factor(as.integer(rownames(imp.gene.lfc.t) %in% lps)))
+rownames(anno_col.lps)<-rownames(imp.gene.lfc.t)
+anno_col.dge<-data.frame(macaque=case_when(rownames(imp.gene.lfc.t) %in% mac.sig ~ "Y",.default = "N"),
+                         baboon=case_when(rownames(imp.gene.lfc.t) %in% bab.sig ~ "Y",.default = "N"),
+                         pig=case_when(rownames(imp.gene.lfc.t) %in% pig.sig ~ "Y",.default = "N"),
+                         bat=case_when(rownames(imp.gene.lfc.t) %in% bat.sig ~ "Y",.default = "N")
 )
-rownames(anno_col.dge)<-colnames(imp.gene.lfc.t)
+rownames(anno_col.dge)<-rownames(imp.gene.lfc.t)
 my_colour=list('macaque' = c("N"="white","Y"='black'),
                'baboon' = c("N"="white","Y"='black'),
                'pig' = c("N"="white","Y"='black'),
                'bat' = c("N"="white","Y"='black'))
 
-# spp.lps.heatmap<-(pheatmap(imp.gene.lfc.t,cluster_rows = FALSE,cluster_cols = TRUE,
-#                            border_color = "#666",treeheight_row = 10,angle_col = 90,treeheight_col = 0,cutree_cols = 9,
-#                            color = my_colors,breaks=breaks,na_col = "#bbbbbb",fontsize_row = 8,fontsize_col = 5.5,
-#                            annotation_col = anno_col.dge,annotation_colors = my_colour,annotation_legend = FALSE))
-
-# ok... transpose back to vertical
-spp.lps.heatmap.vert<-(pheatmap(t(imp.gene.lfc.t),cluster_cols = FALSE,cluster_rows = TRUE,
+# create heatmap
+spp.lps.heatmap.vert<-(pheatmap((imp.gene.lfc.t),cluster_cols = FALSE,cluster_rows = TRUE,
                            border_color = "#666",treeheight_col = 10,angle_row = 90,treeheight_row = 0,cutree_rows = 9,
                            color = my_colors,breaks=breaks,na_col = "#bbbbbb",fontsize_row = 8,fontsize_col = 5.5,
                            annotation_row = anno_col.dge,annotation_colors = my_colour,annotation_legend = FALSE))
@@ -209,21 +215,20 @@ spp.lps.heatmap.vert<-(pheatmap(t(imp.gene.lfc.t),cluster_cols = FALSE,cluster_r
 
 ## now create plots of correlations in LPS response across one-to-one orthologs
 
-bat.lfc<-read.csv("./bat_ortho_dge.csv")
-bat.sig1<-bat.lfc[bat.lfc$sig,]$gene
-bab.lfc<-read.csv("./baboon_reanalysis/baboon_ortho_dge.csv")%>% mutate(log2FoldChange=-log2FoldChange)#correct contrast direction
-bab.sig1<-bab.lfc[bab.lfc$sig,]$gene
-mac.lfc<-read.csv("./macaque_reanalysis/macaque_ortho_dge.csv") %>% mutate(log2FoldChange=-log2FoldChange)
-mac.sig1<-mac.lfc[mac.lfc$sig,]$gene
-pig.lfc<-read.csv("./pig_reanalysis/pig_ortho_dge.csv")
-pig.sig1<-pig.lfc[pig.lfc$sig,]$gene
+bat.lfc<-read.csv("./bat_ortho_dge.csv") %>% 
+  dplyr::select(c("gene","log2FoldChange","eggNOG_OGs","sig")) %>% `colnames<-`(c("batgene","bat","eggNOG_OGs","sig"))
+bat.sig1<-bat.lfc[bat.lfc$sig,]$batgene
+bab.lfc<-read.csv("../baboon_reanalysis/baboon_ortho_dge.csv")%>% mutate(log2FoldChange=-log2FoldChange) %>%#correct contrast direction
+  dplyr::select(c("gene","log2FoldChange","eggNOG_OGs","sig")) %>% `colnames<-`(c("babgene","baboon","eggNOG_OGs","sig"))
+bab.sig1<-bab.lfc[bab.lfc$sig,]$babgene
+mac.lfc<-read.csv("../macaque_reanalysis/macaque_ortho_dge.csv") %>% mutate(log2FoldChange=-log2FoldChange) %>%
+  dplyr::select(c("gene","log2FoldChange","eggNOG_OGs","sig")) %>% `colnames<-`(c("macgene","macaque","eggNOG_OGs","sig"))
+mac.sig1<-mac.lfc[mac.lfc$sig,]$macgene
+pig.lfc<-read.csv("../pig_reanalysis/pig_ortho_dge.csv") %>%
+  dplyr::select(c("gene","log2FoldChange","eggNOG_OGs","sig")) %>% `colnames<-`(c("piggene","pig","eggNOG_OGs","sig"))
+pig.sig1<-pig.lfc[pig.lfc$sig,]$piggene
 
-bat.lfc2<-bat.lfc[,c("gene","log2FoldChange","eggNOG_OGs")] %>% `colnames<-`(c("batgene","bat","eggNOG_OGs"))
-bab.lfc2<-bab.lfc[,c("gene","log2FoldChange","eggNOG_OGs")] %>% `colnames<-`(c("babgene","baboon","eggNOG_OGs"))
-mac.lfc2<-mac.lfc[,c("gene","log2FoldChange","eggNOG_OGs")] %>% `colnames<-`(c("macgene","macaque","eggNOG_OGs"))
-pig.lfc2<-pig.lfc[,c("gene","log2FoldChange","eggNOG_OGs")] %>% `colnames<-`(c("piggene","pig","eggNOG_OGs"))
-
-imp.gene.lfc<-left_join(bat.lfc2,pig.lfc2,by="eggNOG_OGs") %>% left_join(.,bab.lfc2,by='eggNOG_OGs') %>% left_join(.,mac.lfc2,by='eggNOG_OGs')
+imp.gene.lfc<-left_join(bat.lfc,pig.lfc,by="eggNOG_OGs") %>% left_join(.,bab.lfc,by='eggNOG_OGs') %>% left_join(.,mac.lfc,by='eggNOG_OGs')
 rownames(imp.gene.lfc)<-imp.gene.lfc$batgene
 
 imp.gene.lfc$gene<-rownames(imp.gene.lfc)
@@ -242,6 +247,8 @@ g.cor.mac<-ggplot(imp.gene.lfc,aes(x=bat,y=macaque))+cust.theme()+xlab("bat Log2
   geom_text_repel(aes(label=gene),size=2,fontface='italic',alpha=1,max.overlaps = 10,segment.size = 0.125,min.segment.length = 0)
 
 ## upset plot
+
+## define up-regulated genes
 bat.sig.2<-imp.gene.lfc[imp.gene.lfc$batgene %in% bat.sig1 & imp.gene.lfc$bat>0,]$gene
 bab.sig.2<-imp.gene.lfc[imp.gene.lfc$babgene %in% bab.sig1 & imp.gene.lfc$baboon>0,]$gene
 mac.sig.2<-imp.gene.lfc[imp.gene.lfc$macgene %in% mac.sig1 & imp.gene.lfc$macaque>0,]$gene
@@ -273,7 +280,7 @@ upset.plot<-ggplot(tidy_up_spp,aes(x = spp,fill=unique)) + cust.theme()+
   scale_y_continuous(breaks = NULL, lim = c(0, 350), name = "")+
   theme(axis.title.x=element_blank(),axis.title.y=element_text())+ylab("Count")
 
-## plot fig 1 - vertical heatmap
+## plot fig 1 - combine panels outside of R
 ggsave("fig1_vert_pan1.svg",height=11,width=8,plot=
          grid.arrange(p7.pca+labs(tag="A"),g.volcano+labs(tag="B"),
                       go.all.th.up+labs(tag="D"),dotplot.kegg+labs(tag="E"),
@@ -282,7 +289,7 @@ ggsave("fig1_vert_pan2.svg",height=11,width=3,plot=
          (as.ggplot(spp.lps.heatmap.vert)+labs(tag="C")))
 
 
-## test overrepresentation of shared/unique LPS-responsive genes
+## test overrepresentation of LPS-responsive genes that are shared/unique across spp.
 gg.up.df2<-data.frame(bat=rownames(imp.gene.lfc) %in% bat.sig.2,
                       nonbat=rownames(imp.gene.lfc) %in% c(bab.sig.2,mac.sig.2,pig.sig.2))
 table(gg.up.df2$bat,gg.up.df2$nonbat)

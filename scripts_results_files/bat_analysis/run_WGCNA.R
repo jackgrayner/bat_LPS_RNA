@@ -44,7 +44,7 @@ write.csv(vst,"vst_phases3_7_TH_combat.csv",quote=FALSE)
 
 datExpr<-read.csv("vst_phases3_7_TH_combat.csv",row.names = 1)
 datTraits = samples.all.th
-table(rownames(datTraits)==rownames(datExpr)) 
+table(rownames(datTraits)==colnames(datExpr)) 
 
 rowvars.dat<-(rowVars(as.matrix(datExpr)))
 summary(rowvars.dat>quantile(rowvars.dat,0.5))
@@ -170,6 +170,7 @@ dev.off()
 MEs0$Sex<-datTraits$Sex
 MEs0$Est.Age<-datTraits$Age
 
+#make sex into ordinal variable for correlation
 MEs0[MEs0$Sex==1,]$Sex="M"
 MEs0[MEs0$Sex==2,]$Sex="F"
 
@@ -184,14 +185,11 @@ nrow(module_df[module_df$colors==gsub("ME","",sig.mods[4]),])
 
 all.pca+stat_ellipse(level = 0.99,aes(colour=trt),show.legend = FALSE,linewidth=0.4)+scale_colour_manual(values=TrtPalette)+
   theme(legend.position='left')+labs(tag="A",fill='Treatment',subtitle="PCA - all")+
-  g.pcdiff.th+theme(legend.position='none')+labs(tag="B",x="Est.Age",y="PC1",subtitle = "PC1 - all")+
+  g.pcdiff.th+theme(legend.position='none')+labs(tag="B",x="Est.Age",y="PC1",subtitle = "PC1 - LPS treated")+
   p7.pcdiff+labs(tag="D",subtitle=expression(PC1[LPS] - PC1[untreated]))+
   ggplot(MEs0,aes(x=Est.Age,y=MEblue,fill=Sex,colour=Sex))+cust.theme()+theme(legend.position='none')+
   geom_point(alpha=0.75,shape=21,stroke=0.25,aes(fill=Sex),size=2,colour='black')+geom_smooth(method='lm')+scale_colour_manual(values=SexPalette)+scale_fill_manual(values=SexPalette)+
   ylab("Blue module (N = 1648)")+labs(tag="C",subtitle="\"Inflammation\" module")+
-  #ggplot(MEs0,aes(x=Est.Age,y=MEmagenta,fill=Sex,colour=Sex))+cust.theme()+labs(tag="D")+
-  #geom_point(alpha=0.75,shape=21,stroke=0.25,aes(fill=Sex),size=2,colour='black')+geom_smooth(method='lm')+scale_colour_manual(values=SexPalette)+scale_fill_manual(values=SexPalette)+
-  #ylab("Magenta module (N = 97)")+theme(legend.position='none')+
   ggplot(MEs0,aes(x=Est.Age,y=MEblack,fill=Sex,colour=Sex))+cust.theme()+labs(tag="E",subtitle="\"B cell activation\" module")+
   geom_point(alpha=0.75,shape=21,stroke=0.25,aes(fill=Sex),size=2,colour='black')+geom_smooth(method='lm')+scale_colour_manual(values=SexPalette)+scale_fill_manual(values=SexPalette)+
   ylab("Black module (N = 232)")+theme(legend.position='none')+
@@ -266,7 +264,6 @@ car::Anova(lm(MEblue~Est.Age,data=MEs0[MEs0$Sex=="F",]),type="II")
 car::Anova(lm(MEmagenta~Est.Age,data=MEs0[MEs0$Sex=="M",]),type="II")
 car::Anova(lm(MEblack~Est.Age,data=MEs0[MEs0$Sex=="M",]),type="II")
 car::Anova(lm(MEred~Est.Age,data=MEs0[MEs0$Sex=="M",]),type="II")
-
 
 
 sig.mods1<-cbind(MEs0$MEblue,MEs0$MEmagenta,MEs0$MEblack,MEs0$MEred)
