@@ -209,13 +209,13 @@ spp.lps.heatmap.vert<-(pheatmap(t(imp.gene.lfc.t),cluster_cols = FALSE,cluster_r
 
 ## now create plots of correlations in LPS response across one-to-one orthologs
 
-bat.lfc<-read.csv("./ortho_dge/bat_ortho_dge.csv")
+bat.lfc<-read.csv("./bat_ortho_dge.csv")
 bat.sig1<-bat.lfc[bat.lfc$sig,]$gene
-bab.lfc<-read.csv("./ortho_dge/baboon_ortho_dge.csv")%>% mutate(log2FoldChange=-log2FoldChange)#correct contrast direction
+bab.lfc<-read.csv("./baboon_reanalysis/baboon_ortho_dge.csv")%>% mutate(log2FoldChange=-log2FoldChange)#correct contrast direction
 bab.sig1<-bab.lfc[bab.lfc$sig,]$gene
-mac.lfc<-read.csv("./ortho_dge/macaque_ortho_dge.csv") %>% mutate(log2FoldChange=-log2FoldChange)
+mac.lfc<-read.csv("./macaque_reanalysis/macaque_ortho_dge.csv") %>% mutate(log2FoldChange=-log2FoldChange)
 mac.sig1<-mac.lfc[mac.lfc$sig,]$gene
-pig.lfc<-read.csv("./ortho_dge/pig_ortho_dge.csv")
+pig.lfc<-read.csv("./pig_reanalysis/pig_ortho_dge.csv")
 pig.sig1<-pig.lfc[pig.lfc$sig,]$gene
 
 bat.lfc2<-bat.lfc[,c("gene","log2FoldChange","eggNOG_OGs")] %>% `colnames<-`(c("batgene","bat","eggNOG_OGs"))
