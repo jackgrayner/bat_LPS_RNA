@@ -12,14 +12,14 @@ Gene expression counts were quantified against a reference transcriptome for Phy
 
 Raw reads from newly collected data are available from the NCBI SRA under the BioProject accession PRJNA1125049.
 
-## RNA-seq
+## RNAseq_quant
 
 Bash scripts used to process raw RNA-sequencing data
 
-## miRNA
+## miRNA_quant_DiffExpr
 
 Bash and R scripts used to process and analyse miRNA sequencing data
 
-## scripts_results_files
+## RNAseq_DiffExpr_scripts_results_files
 
 R scripts used to analyse gene expression counts, alongside results files.
