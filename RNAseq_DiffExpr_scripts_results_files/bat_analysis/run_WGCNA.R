@@ -177,6 +177,10 @@ MEs0[MEs0$Sex==2,]$Sex="F"
 #run main scrpt first for pca plots
 MEs0$Est.Age<-samples.all.th$Est.Age
 
+#if removing duplicates
+summary(rownames(MEs0)==rownames(samples.all.th))
+MEs0<-MEs0[!duplicated(samples.all.th$Band),]
+
 sig.mods
 nrow(module_df[module_df$colors==gsub("ME","",sig.mods[1]),])
 nrow(module_df[module_df$colors==gsub("ME","",sig.mods[2]),])
@@ -200,50 +204,24 @@ all.pca+stat_ellipse(level = 0.99,aes(colour=trt),show.legend = FALSE,linewidth=
 ggsave("PCA_wgcna_sexage.svg",dpi=600,height=5.5,width=9)
 #ggsave("PCA_wgcna_sexage_nodupes.svg",dpi=600,height=5,width=9)
 
+plot_GO_overrep_mods<-function(col){
+  go.OR<-clusterProfiler::simplify(enrichGO(gene = module_df[module_df$colors==col,]$gene_id,
+                                            universe = module_df$gene_id,#list of all genes
+                                            keyType = "SYMBOL",
+                                            OrgDb = organism,
+                                            ont = "BP",
+                                            pAdjustMethod = "BH",
+                                            pvalueCutoff = 1,
+                                            readable = TRUE),
+                                   cutoff=0.7,by = "p.adjust",select_fun = min,
+                                   measure = "Wang",semData = NULL)@result
+  plot_GO_fun(go.OR)
+}
 
-go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="blue",]$gene_id,
-                                          universe = module_df$gene_id,#list of all genes
-                                          keyType = "SYMBOL",
-                                          OrgDb = organism,
-                                          ont = "BP",
-                                          pAdjustMethod = "BH",
-                                          pvalueCutoff = 0.05,
-                                          readable = TRUE),cutoff=0.7,by = "p.adjust",select_fun = min,
-                                 measure = "Wang",semData = NULL)@result
-g.go.blue<-plot_GO_fun(go.OR)#B cell stuff
-
-go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="magenta",]$gene_id,
-                         universe = module_df$gene_id,#list of all genes
-                         keyType = "SYMBOL",
-                         OrgDb = organism,
-                         ont = "BP",
-                         pAdjustMethod = "BH",
-                         pvalueCutoff = 1,
-                         readable = TRUE),cutoff=0.7,by = "p.adjust",select_fun = min,
-                measure = "Wang",semData = NULL)@result
-g.go.magenta<-plot_GO_fun(go.OR)
-
-go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="black",]$gene_id,
-                         universe = module_df$gene_id,#list of all genes
-                         keyType = "SYMBOL",
-                         OrgDb = organism,
-                         ont = "BP",
-                         pAdjustMethod = "BH",
-                         pvalueCutoff = 0.05,
-                         readable = TRUE),cutoff=0.7,by = "p.adjust",select_fun = min,
-                measure = "Wang",semData = NULL)@result
-g.go.black<-plot_GO_fun(go.OR)#T cell stuff
-
-go.OR<-simplify(enrichGO(gene = module_df[module_df$colors=="red",]$gene_id,
-                         universe = module_df$gene_id,#list of all genes
-                         keyType = "SYMBOL",
-                         OrgDb = organism,
-                         ont = "BP",
-                         pAdjustMethod = "BH",
-                         pvalueCutoff = 0.05,
-                         readable = TRUE),cutoff=0.7,by = "p.adjust",select_fun = min,
-                measure = "Wang",semData = NULL)@result
-g.go.red<-plot_GO_fun(go.OR)#inflammation
+g.go.blue<-plot_GO_overrep_mods('blue')
+g.go.magenta<-plot_GO_overrep_mods('magenta')
+g.go.black<-plot_GO_overrep_mods('black')
+g.go.red<-plot_GO_overrep_mods('red')
 
 g.go.blue+ggtitle("Blue module")+
   #g.go.magenta+ggtitle("Magenta module")+
@@ -251,25 +229,22 @@ g.go.blue+ggtitle("Blue module")+
   g.go.red+ggtitle("Red module")+plot_layout(nrow=2)
 
 ggsave("modules_GO.png",height=6,width=10)
-ggsave("modules_GO.pdf",height=7,width=10)
 
-library(lme4)
-car::Anova(lm(MEblue~Sex*Est.Age,data=MEs0),type="II")
-car::Anova(lm(MEmagenta~Sex*Est.Age,data=MEs0),type="II")
-car::Anova(lm(MEblack~Sex*Est.Age,data=MEs0),type="II")
+#main models - type III if interaction retained
+car::Anova(lm(MEblue~Sex+Est.Age,data=MEs0),type="II")
+car::Anova(lm(MEmagenta~Sex+Est.Age,data=MEs0),type="II")
+car::Anova(lm(MEblack~Sex*Est.Age,data=MEs0),type="III")
 car::Anova(lm(MEred~Sex*Est.Age,data=MEs0),type="III")
 
+#sex-specific models
 car::Anova(lm(MEblue~Est.Age,data=MEs0[MEs0$Sex=="M",]),type="II")
 car::Anova(lm(MEblue~Est.Age,data=MEs0[MEs0$Sex=="F",]),type="II")
 car::Anova(lm(MEmagenta~Est.Age,data=MEs0[MEs0$Sex=="M",]),type="II")
 car::Anova(lm(MEblack~Est.Age,data=MEs0[MEs0$Sex=="M",]),type="II")
 car::Anova(lm(MEred~Est.Age,data=MEs0[MEs0$Sex=="M",]),type="II")
 
-
+#manova? not really necessary
 sig.mods1<-cbind(MEs0$MEblue,MEs0$MEmagenta,MEs0$MEblack,MEs0$MEred)
 man1<-manova(sig.mods1~Sex*Est.Age,data=MEs0)
 summary(man1)
 
-for (col in colnames(MEs0)){
-  car::Anova(lm(col ~ Sex * Age,data=MEs0),type="III")
-}

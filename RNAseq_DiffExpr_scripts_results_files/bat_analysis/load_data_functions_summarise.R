@@ -103,7 +103,7 @@ plot_GO_fun<-function(go.OR){
         theme(axis.title.y=element_blank(),panel.grid=element_blank(),
               plot.background=element_rect(fill='white',colour='white'),
               panel.background=element_rect(fill="white",colour='white',linewidth = 0.25),
-              panel.border = element_blank(),legend.direction = "horizontal",legend.position='top')+
+              panel.border = element_blank(),legend.direction = "vertical",legend.position='right')+
         geom_segment(aes(x=min1,xend=-log10(p.adjust),y=Description,group=Description),colour="#999",linewidth=0.5)+
         geom_point(aes(size=Count),shape=21)+
         scale_fill_gradient(low = "#eddd8e", high = "#ba3636", na.value = NA)+
@@ -123,6 +123,8 @@ plot_GO_overrep<-function(results_table,dir){
     gene_list_interest<-gene_list_interest[gene_list_interest$log2FoldChange>0,]$gene
   }else if (dir=="dn"){
     gene_list_interest<-gene_list_interest[gene_list_interest$log2FoldChange<0,]$gene
+  }else{
+    gene_list_interest<-gene_list_interest
   }
   go.OR<-clusterProfiler::simplify(enrichGO(gene = gene_list_interest,
                                             universe = results_table$gene,#list of all genes
@@ -210,7 +212,7 @@ g.ages.paired<-ggplot(samples.all[samples.all$Phase %in% c("Phase7.1","Phase7.2"
   ggtitle("Paired individuals")
 
 g.ages.th+g.ages.c0+g.ages.paired+plot_layout(nrow=3)
-#ggsave("sex_age_distribution.png",width=4,height=8)
+ggsave("sex_age_distribution.png",width=4,height=8)
 
 ## variance partition - exploratory (takes a while to run)
 

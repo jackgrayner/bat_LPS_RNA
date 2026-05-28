@@ -144,7 +144,7 @@ g.pcdiff.th<-ggplot(pca.trt[pca.trt$Trtmt=="TH",],aes(x=Est.Age,y=-PC1,fill=Sex,
 
 #lm.pca.all<-lmer(PC1~Sex*Est.Age+(1|Phase.batch),data=pca.trt[pca.trt$Trtmt=="TH",])
 lm.pca.all<-lmer(PC1~Sex+Est.Age+(1|Phase.batch),data=pca.trt[pca.trt$Trtmt=="TH",])
-lm.pca.all<-lmer(PC1~Sex+Est.Age+lnNLR+(1|Phase.batch),data=pca.trt[pca.trt$Trtmt=="TH",])
+#lm.pca.all<-lmer(PC1~Sex+Est.Age+lnNLR+(1|Phase.batch),data=pca.trt[pca.trt$Trtmt=="TH",])
 plot(lm.pca.all)
 qqnorm(resid(lm.pca.all))
 qqline(resid(lm.pca.all))
@@ -459,8 +459,7 @@ table(dds.trt.th.age$sig,dds.trt.th.age$LPS_affected)
 fisher.test(table(dds.trt.th.age$sig,dds.trt.th.age$LPS_affected))
 
 #plot sex-associated genes from lps-treated samples in C0 samples
-dds.sex.c0.th<-merge(dds.trt.c0.sex,dds.trt.th.sex,by="gene")
-dds.sex.c0.th.thsig<-dds.sex.c0.th[dds.sex.c0.th$sig.y,]
+dds.sex.c0.th.thsig<-merge(dds.trt.c0.sex,dds.trt.th.sex[dds.trt.th.sex$sig,],by="gene")
 cor.test(dds.sex.c0.th.thsig$log2FoldChange.x,dds.sex.c0.th.thsig$log2FoldChange.y,method = 'spearman')
 dds.sex.c0.th.thsig.conc<-dds.sex.c0.th.thsig[dds.sex.c0.th.thsig$log2FoldChange.x*dds.sex.c0.th.thsig$log2FoldChange.y>0,]
 t.test(dds.sex.c0.th.thsig.conc$log2FoldChange.x,dds.sex.c0.th.thsig.conc$log2FoldChange.y,paired=TRUE)
@@ -474,11 +473,10 @@ g.c0.th.sexcomp<-ggplot(dds.sex.c0.th.thsig,aes(x=log2FoldChange.x,y=log2FoldCha
   coord_cartesian(xlim=c(-3,3),ylim=c(-3,3))+
   theme(legend.position='none')+labs(subtitle="Sex-biased",tag="B",x='Untreated log2FC',y='LPS-treated log2FC')+
   scale_fill_manual(values=c("#aaaaaa","#b459ff"))+
-  annotate("text",x=2,y=-2,label='rho = 0.61\nP < 0.001',size=3)
+  annotate("text",x=2,y=-2,label='rho = 0.60\nP < 0.001',size=3)
 
 #plot age-associated genes from lps-treated samples in C0 samples
-dds.age.c0.th<-merge(dds.trt.c0.age,dds.trt.th.age,by="gene")
-dds.age.c0.th.thsig<-dds.age.c0.th[dds.age.c0.th$sig.y,]
+dds.age.c0.th<-merge(dds.trt.c0.age,dds.trt.th.age[dds.trt.th.age$sig,],by="gene")
 cor.test(dds.age.c0.th.thsig$log2FoldChange.x,dds.age.c0.th.thsig$log2FoldChange.y,method = 'spearman')
 dds.age.c0.th.thsig.conc<-dds.age.c0.th.thsig[dds.age.c0.th.thsig$log2FoldChange.x*dds.age.c0.th.thsig$log2FoldChange.y>0,]
 t.test(dds.age.c0.th.thsig.conc$log2FoldChange.x,dds.age.c0.th.thsig.conc$log2FoldChange.y,paired=TRUE)
@@ -492,7 +490,7 @@ g.c0.th.agecomp<-ggplot(dds.age.c0.th.thsig,aes(x=log2FoldChange.x,y=log2FoldCha
   coord_cartesian(xlim=c(-1.6,1.15),ylim=c(-1.6,1.15))+
   theme(legend.position='none')+labs(subtitle="Age-associated",tag="E",x='Untreated log2FC',y='LPS-treated log2FC')+
   scale_fill_manual(values=c("#aaaaaa","#E3E7AF"))+
-  annotate("text",x=0.75,y=-1.25,label='rho = 0.80\nP < 0.001',size=3)
+  annotate("text",x=0.75,y=-1.25,label='rho = 0.82\nP < 0.001',size=3)
 
 sex.vol<-plot_volcano(dds.trt.th.sex[-log10(dds.trt.th.sex$padj)<30,])+
   labs(tag="A",subtitle='Sex-biased (LPS-treated)',x='log2FC')
@@ -509,7 +507,7 @@ go.th.age.dn<-plot_GO_overrep(dds.trt.th.age,'dn')+ labs(subtitle="Age: down (lo
 
 ggsave('fig2.svg',
        plot=sex.vol+go.th.sex.m+g.c0.th.sexcomp+go.th.sex.f+age.vol+go.th.age.up+g.c0.th.agecomp+go.th.age.dn +
-                         plot_layout(nrow=4,widths=c(1,1)),dpi=600,height=9.5,width=8.25)
+                         plot_layout(nrow=4,widths=c(1,1)),dpi=600,height=10,width=8.25)
 
 # ggsave('fig2_nodupes.png',
 #        plot=g.c0.th.sexcomp+go.th.sex.m+sex.vol+go.th.sex.f+g.c0.th.agecomp+go.th.age.up+age.vol+go.th.age.dn +
